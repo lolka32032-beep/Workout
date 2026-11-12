@@ -27,8 +27,10 @@
   --ok:#4ade80;--ok-soft:#12351f;--warn:#fbbf24;--warn-soft:#3a2a0c;--bad:#f87171;--bad-soft:#3b1414;
   --track:#2c2c2e;--shadow:none;
 }}
+html,body{height:100%}
 html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-body{padding:0 0 calc(80px + env(safe-area-inset-bottom))}
+/* the app is a column: a scrolling screen on top, the tab bar glued to the bottom */
+body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;padding:0}
 button,input,select{font:inherit;color:inherit}
 button{border:0;background:none;cursor:pointer;text-align:left}
 input,select{width:100%;background:var(--card2);border:0;border-radius:12px;padding:11px 12px;font-size:16px;appearance:none}
@@ -41,7 +43,7 @@ h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute
 .num{font-variant-numeric:tabular-nums}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .hint{font-size:13px;color:var(--muted);margin:8px 4px}
-#app{max-width:560px;margin:0 auto;padding:2px 14px 0}
+#app{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;max-width:560px;width:100%;margin:0 auto;padding:calc(env(safe-area-inset-top) + 4px) 14px 18px}
 .card{display:block;width:100%;background:var(--card);border-radius:16px;padding:13px 14px;margin:0 0 8px;box-shadow:var(--shadow)}
 .card:active{opacity:.72}
 .hero{padding:16px}
@@ -64,13 +66,13 @@ h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute
 .w .row b{font-size:16px}
 .w .small{margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* tabbar */
-.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -2px 14px rgba(0,0,0,.07);padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:20}
+.tabbar{position:relative;flex:none;display:flex;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -2px 14px rgba(0,0,0,.07);padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:20}
 .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:12px;color:var(--muted);font-size:11px;font-weight:600}
 .tabbar button.on{color:var(--accent);background:var(--accent-soft)}
 .tabbar .i{font-size:20px;line-height:1}
 /* current workout (session) */
-.sheet.full{height:calc(100vh - 18px);max-height:none;display:flex;flex-direction:column;padding:0;overflow:hidden;border-radius:20px 20px 0 0}
-.sess-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px 10px;border-bottom:1px solid var(--line);background:var(--card);flex:none}
+.sheet.full{height:calc(100vh - 18px);height:calc(100dvh - 18px);max-height:none;display:flex;flex-direction:column;padding:0;overflow:hidden;border-radius:20px 20px 0 0}
+.sess-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(13px + env(safe-area-inset-top)) 14px 10px;border-bottom:1px solid var(--line);background:var(--card);flex:none}
 .sess-head .l{display:flex;align-items:center;gap:8px;min-width:0}
 .sess-head b{font-size:15px}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px var(--ok-soft);flex:none}
@@ -167,7 +169,7 @@ h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute
 <input id="fileImport" type="file" accept="application/json,.json" hidden>
 <script>
 'use strict';
-const KEY = 'workout-app-v1', APP_VERSION = 4;
+const KEY = 'workout-app-v1', APP_VERSION = 5;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = new Intl.NumberFormat('ru-RU', {maximumFractionDigits: 1});
@@ -945,7 +947,7 @@ function refreshAfterChange() { render(); if (!$('#sheet').hidden && sheetCtx) s
 
 // ---------- actions ----------
 const ACT = {
-  tab: el => { tab = el.dataset.v; exQ = ''; render(); window.scrollTo(0, 0); },
+  tab: el => { tab = el.dataset.v; exQ = ''; render(); const a = $('#app'); if (a) a.scrollTop = 0; },
   closeSheet: () => closeSheet(),
   undo: () => { const fn = undoFn; undoFn = null; $('#undo').hidden = true; if (fn) fn(); },
   // workouts
@@ -1035,7 +1037,7 @@ const ACT = {
   },
 };
 // re-render the diary behind an open sheet, so the list stays fresh after edits
-function render0() { if (tab === 'diary' && !$('#sheet').hidden) { const app = $('#app'); const scroll = window.scrollY; app.innerHTML = vDiary(); window.scrollTo(0, scroll); } }
+function render0() { if (tab === 'diary' && !$('#sheet').hidden) { const app = $('#app'); const scroll = app.scrollTop; app.innerHTML = vDiary(); app.scrollTop = scroll; } }
 
 // ---------- events ----------
 document.addEventListener('click', e => {
