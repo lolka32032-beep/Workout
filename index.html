@@ -64,10 +64,52 @@ h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute
 .w .row b{font-size:16px}
 .w .small{margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* tabbar */
-.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:20}
-.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;color:var(--muted);font-size:11px;font-weight:600}
-.tabbar button.on{color:var(--accent)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -2px 14px rgba(0,0,0,.07);padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:20}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:12px;color:var(--muted);font-size:11px;font-weight:600}
+.tabbar button.on{color:var(--accent);background:var(--accent-soft)}
 .tabbar .i{font-size:20px;line-height:1}
+/* current workout (session) */
+.sheet.full{height:calc(100vh - 18px);max-height:none;display:flex;flex-direction:column;padding:0;overflow:hidden;border-radius:20px 20px 0 0}
+.sess-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px 10px;border-bottom:1px solid var(--line);background:var(--card);flex:none}
+.sess-head .l{display:flex;align-items:center;gap:8px;min-width:0}
+.sess-head b{font-size:15px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px var(--ok-soft);flex:none}
+.dot.off{background:var(--warn);box-shadow:0 0 0 4px var(--warn-soft)}
+.tt{font-variant-numeric:tabular-nums;font-weight:700;font-size:16px}
+.ib{width:38px;height:38px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text);flex:none}
+.sess-body{flex:1;overflow:auto;padding:14px}
+.sess-foot{border-top:1px solid var(--line);background:var(--card);padding:10px 14px calc(12px + env(safe-area-inset-bottom));flex:none}
+.now{display:flex;align-items:center;gap:10px}
+.now .t{flex:1;min-width:0}
+.now .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+.primary{min-height:50px;padding:0 18px;flex:none}
+.bigset{background:var(--card);border-radius:18px;padding:14px;margin:12px 0 10px}
+.bigset .srow{gap:10px;margin:0}
+.bigset .srow input{padding:14px 12px;font-size:20px;font-weight:700;flex:1;width:auto;min-width:0}
+.bigset .srow .u{font-size:14px}
+.bigset .srow .n,.bigset .srow .x{display:none}
+.sess-body.resting{opacity:.45}
+.sess-body.resting *{pointer-events:none}
+.setlist{background:var(--card);border-radius:16px;padding:4px 6px;margin:0 0 12px}
+.setline{display:flex;align-items:center;gap:4px}
+.setline .setrow{flex:1}
+.setlist .addset{margin:4px 2px 6px}
+.setrow{display:flex;align-items:center;gap:10px;width:100%;padding:11px 8px;border-radius:12px}
+.setrow b{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.setrow .n{width:20px;color:var(--muted);font-size:13px;text-align:center;flex:none}
+.setrow.cur{background:var(--accent-soft)}
+.setrow.cur b{color:var(--accent)}
+.exhead b{font-size:20px}
+.meta{font-size:13px;color:var(--muted);margin-top:3px}
+.prline{min-height:18px;margin:0 2px 6px;font-size:13px}
+.pr{color:var(--ok);font-weight:700}
+.restpanel{text-align:center}
+.restpanel .lbl{font-size:12px;color:var(--muted)}
+.restpanel .clock{font-size:46px;font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:2px 0;font-variant-numeric:tabular-nums}
+.restpanel .next{font-size:13px;color:var(--muted);min-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.restpanel .row{display:flex;gap:8px;margin-top:10px}
+.restpanel button{flex:1;background:var(--card2);border-radius:12px;padding:13px;font-weight:600;color:var(--accent)}
+.link{color:var(--accent);font-size:13px;font-weight:600;padding:6px 0}
 /* sheet */
 #sheet{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:40}
 #sheet[hidden],#rest[hidden],#undo[hidden]{display:none!important}
@@ -127,7 +169,7 @@ h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute
 <input id="fileImport" type="file" accept="application/json,.json" hidden>
 <script>
 'use strict';
-const KEY = 'workout-app-v1', APP_VERSION = 2;
+const KEY = 'workout-app-v1', APP_VERSION = 3;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = new Intl.NumberFormat('ru-RU', {maximumFractionDigits: 1});
@@ -150,6 +192,7 @@ const KIND = {
   time:     {label: 'Время', icon: '⏱️'},
   distance: {label: 'Дистанция и время', icon: '🏃'},
 };
+const REST_CHOICES = [30, 45, 60, 90, 120, 150, 180, 240, 300];
 const GROUPS = {
   chest: 'Грудь',
   back: 'Спина',
@@ -209,13 +252,17 @@ function defaultExercises() {
 }
 
 // ---------- storage ----------
-function blank() { return {version: 1, exercises: defaultExercises(), workouts: [], settings: {rest: 90, goal: 3}, lastBackup: 0}; }
+function blank() { return {version: 1, exercises: defaultExercises(), workouts: [], settings: {restSet: 90, restEx: 120, goal: 3}, lastBackup: 0}; }
 let S = blank(), EX = new Map();
 function index() { EX = new Map(S.exercises.map(e => [e.id, e])); }
 function migrate(d) {
   const o = Object.assign(blank(), d);
-  o.settings = Object.assign({rest: 90, goal: 3}, o.settings || {});
-  o.exercises = (o.exercises || []).map(e => Object.assign({unit: '', custom: false}, e));
+  const st = o.settings || {};
+  o.settings = Object.assign({restSet: 90, restEx: 120, goal: 3}, st);
+  // earlier versions had a single rest value
+  if (st.rest != null && st.restSet == null) o.settings.restSet = num(st.rest);
+  delete o.settings.rest;
+  o.exercises = (o.exercises || []).map(e => Object.assign({unit: '', custom: false, target: ''}, e));
   o.workouts = (o.workouts || []).map(w => Object.assign({items: []}, w));
   for (const w of o.workouts) for (const it of w.items) it.sets = it.sets || [];
   return o;
@@ -321,9 +368,9 @@ let tab = 'diary', exQ = '', W = null, sheetCtx = null;
 const TABS = [['diary', 'Дневник', '🗓'], ['ex', 'Упражнения', '🏋️'], ['progress', 'Прогресс', '📈'], ['more', 'Ещё', '⚙️']];
 
 // ---------- shared pieces ----------
-function openSheet(html, ctx) {
+function openSheet(html, ctx, cls) {
   sheetCtx = ctx || null;
-  $('#sheet').innerHTML = `<div class="sheet" id="sheetBody">${html}</div>`;
+  $('#sheet').innerHTML = `<div class="sheet ${cls || ''}" id="sheetBody">${html}</div>`;
   $('#sheet').hidden = false;
   document.body.style.overflow = 'hidden';
 }
@@ -339,7 +386,7 @@ function undoToast(text, fn) {
 // ---------- rest timer ----------
 let restEnd = 0, restTimer = null;
 function startRest(sec) {
-  restEnd = Date.now() + (sec || num(S.settings.rest) || 90) * 1000;
+  restEnd = Date.now() + (sec || num(S.settings.restSet) || 90) * 1000;
   clearInterval(restTimer); restTimer = setInterval(paintRest, 500); paintRest();
 }
 function paintRest() {
@@ -363,14 +410,20 @@ function workoutCard(w) {
 function vDiary() {
   const wk = weekWorkouts(currentWeek()), goal = num(S.settings.goal) || 3, done = wk.length;
   const pct = goal ? Math.min(100, done / goal * 100) : 0, st = streak();
+  const active = S.workouts.find(w => w.startedAt && !w.end);
   let h = `<h1>Дневник</h1>
   <section class="card hero">
     <div class="lbl">Тренировок на этой неделе</div>
     <div class="big num">${done}<small> из ${goal}</small></div>
     <div class="bar"><i class="${done >= goal ? 'ok' : 'warn'}" style="width:${pct}%"></i></div>
     <div class="row small num" style="margin-top:8px"><span>${st ? 'серия ' + st + ' ' + plural(st, 'неделя', 'недели', 'недель') : 'серии пока нет'}</span><span>всего ${S.workouts.length}</span></div>
-  </section>
-  <div class="btns"><button class="btn" data-act="newW">▶ Начать тренировку</button></div>`;
+  </section>`;
+  if (active) {
+    h += `<div class="btns"><button class="btn" data-act="resumeW" data-id="${active.id}">▶ Продолжить тренировку</button></div>
+      <p class="hint" style="text-align:center;margin:-6px 0 12px">идёт с ${esc(active.start || '')} · ${fmtClock(elapsedMs(active))}</p>`;
+  } else {
+    h += `<div class="btns"><button class="btn" data-act="newW">▶ Начать тренировку</button></div>`;
+  }
   const list = sortWorkouts(S.workouts);
   if (!list.length) return h + `<div class="empty"><p>Пока нет ни одной тренировки.<br>Нажми «Начать тренировку» — упражнения выберешь из библиотеки.</p></div>`;
   if (list.length) h += `<button class="btn ghost wide" data-act="repeatLast">↻ Повторить последнюю</button>`;
@@ -447,7 +500,9 @@ function vMore() {
   <h3>Тренировки</h3>
   <section class="card">
     <label class="small">Отдых между подходами
-      <select data-rest style="margin-top:6px">${[45, 60, 90, 120, 150, 180, 240].map(v => `<option value="${v}" ${num(S.settings.rest) === v ? 'selected' : ''}>${fmtSec(v)}</option>`).join('')}</select></label>
+      <select data-restset style="margin-top:6px">${REST_CHOICES.map(v => `<option value="${v}" ${num(S.settings.restSet) === v ? 'selected' : ''}>${fmtSec(v)}</option>`).join('')}</select></label>
+    <label class="small" style="display:block;margin-top:14px">Отдых между упражнениями
+      <select data-restex style="margin-top:6px">${REST_CHOICES.map(v => `<option value="${v}" ${num(S.settings.restEx) === v ? 'selected' : ''}>${fmtSec(v)}</option>`).join('')}</select></label>
     <label class="small" style="display:block;margin-top:14px">Цель: тренировок в неделю
       <select data-goal style="margin-top:6px">${[2, 3, 4, 5, 6].map(v => `<option value="${v}" ${num(S.settings.goal) === v ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
   </section>
@@ -462,13 +517,13 @@ function vMore() {
 }
 
 // ---------- workout editor ----------
-function setFieldsHtml(ex, i, j, s) {
+function setFieldsHtml(ex, i, j, s, units) {
   const v = f => (s[f] ?? '') === '' || s[f] == null ? '' : esc(s[f]);
-  const inp = (f, ph, mode) => `<input inputmode="${mode || 'decimal'}" data-i="${i}" data-j="${j}" data-f="${f}" value="${v(f)}" placeholder="${ph}">`;
-  if (ex.kind === 'weight') return inp('w', 'кг') + '<span class="u">×</span>' + inp('r', 'повт', 'numeric');
-  if (ex.kind === 'reps') return inp('r', 'повторы', 'numeric');
-  if (ex.kind === 'time') return inp('sec', 'секунды', 'numeric');
-  return inp('dist', ex.unit || 'км') + inp('sec', 'секунды', 'numeric');
+  const inp = (f, ph, mode, unit) => `<input inputmode="${mode || 'decimal'}" data-i="${i}" data-j="${j}" data-f="${f}" value="${v(f)}" placeholder="${ph}">` + (units ? `<span class="u">${unit}</span>` : '');
+  if (ex.kind === 'weight') return inp('w', 'кг', 'decimal', 'кг') + '<span class="u">×</span>' + inp('r', 'повт', 'numeric', 'повт');
+  if (ex.kind === 'reps') return inp('r', 'повторы', 'numeric', 'повт');
+  if (ex.kind === 'time') return inp('sec', 'секунды', 'numeric', 'сек');
+  return inp('dist', ex.unit || 'км', 'decimal', ex.unit || 'км') + inp('sec', 'секунды', 'numeric', 'сек');
 }
 function setRowHtml(ex, i, j, s) {
   return `<div class="srow"><span class="n">${j + 1}</span>${setFieldsHtml(ex, i, j, s)}
@@ -507,7 +562,11 @@ function workoutHtml() {
     <div class="wsum" id="wSum">${sumHtml()}</div>
     <div class="btns"><button class="btn ghost" data-act="pickEx">+ Упражнение</button><button class="btn" data-act="closeW">Готово</button></div>`;
 }
-function paintItems() { if ($('#wItems')) $('#wItems').innerHTML = itemsHtml(); paintSum(); }
+function paintItems() {
+  if ($('#wItems')) $('#wItems').innerHTML = itemsHtml();
+  if ($('#sessBody') && W && W.startedAt) { $('#sessBody').innerHTML = sessionBodyHtml(); $('#sessFoot').innerHTML = sessionFootHtml(); }
+  paintSum();
+}
 function paintSum() { if ($('#wSum')) $('#wSum').innerHTML = sumHtml(); }
 function openWorkout(id) {
   let w = S.workouts.find(x => x.id === id);
@@ -529,16 +588,268 @@ function closeWorkout() {
 function repeatWorkout(srcId) {
   const src = S.workouts.find(w => w.id === srcId);
   if (!src) return;
-  const w = {id: uid(), date: today(), start: nowTime(), end: '', note: src.note || '', items: JSON.parse(JSON.stringify(src.items || []))};
+  const w = {id: uid(), date: today(), start: nowTime(), end: '', note: src.note || '',
+    items: JSON.parse(JSON.stringify(src.items || [])), startedAt: Date.now(), pausedMs: 0, focus: {i: 0, j: 0}};
   S.workouts.push(w); save(); render();
   toast('Упражнения и веса скопированы');
-  openWorkout(w.id);
+  openSession(w.id);
 }
 function defaultSet(kind) {
   if (kind === 'weight') return {w: '', r: ''};
   if (kind === 'reps') return {r: ''};
   if (kind === 'time') return {sec: ''};
   return {dist: '', sec: ''};
+}
+
+// ---------- current workout: a session with clear states ----------
+let sessTimerId = null, sessRest = null, sessWork = null;
+
+function elapsedMs(w) {
+  if (!w || !w.startedAt) return 0;
+  return Math.max(0, (w.pausedAt || Date.now()) - w.startedAt - (w.pausedMs || 0));
+}
+function fmtClock(ms) {
+  const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  return h ? h + ':' + pad(m) + ':' + pad(s % 60) : m + ':' + pad(s % 60);
+}
+// best result of an exercise in every workout except the current one
+function bestBefore(exId, exceptId) {
+  const ex = exOf(exId);
+  let best = null;
+  for (const w of S.workouts) {
+    if (w.id === exceptId) continue;
+    for (const it of w.items || []) if (it.exId === exId) for (const s of it.sets || []) {
+      const v = bestValue(ex, s);
+      if (v > 0 && (!best || v > best.v)) best = {v, set: s, date: w.date};
+    }
+  }
+  return best;
+}
+// what was done the last time this exercise came up before the current workout
+function prevPerformance(exId) {
+  const ex = exOf(exId);
+  let best = null, bestDate = '';
+  for (const w of S.workouts) {
+    if (w.id === W.id) continue;
+    let bw = null, bv = 0;
+    for (const it of w.items || []) if (it.exId === exId) for (const s of it.sets || []) {
+      const v = bestValue(ex, s);
+      if (v > bv) { bv = v; bw = s; }
+    }
+    if (bw && w.date > bestDate) { best = bw; bestDate = w.date; }
+  }
+  return best ? {set: best, date: bestDate} : null;
+}
+// a new set pre-filled with the last performance, so nothing has to be typed twice
+function autoSet(exId) {
+  const p = prevPerformance(exId);
+  return p ? Object.assign({}, p.set) : defaultSet(exOf(exId).kind);
+}
+function prLineHtml(ex, s) {
+  const v = bestValue(ex, s);
+  if (!v) return '';
+  const before = bestBefore(ex.id, W.id);
+  if (!before) return `<span class="muted">первый результат по упражнению</span>`;
+  if (v > before.v + 1e-9) return `<span class="pr">🎉 рекорд: ${fmtSet(ex, s)} · было ${fmtSet(ex, before.set)}</span>`;
+  return `<span class="muted">личный рекорд: ${fmtSet(ex, before.set)}</span>`;
+}
+function newPrs(w) {
+  const out = [];
+  for (const it of w.items || []) {
+    const ex = exOf(it.exId), best = bestIn(it);
+    if (!best) continue;
+    const v = bestValue(ex, best), before = bestBefore(ex.id, w.id);
+    if (v > 0 && (!before || v > before.v + 1e-9)) out.push({ex, set: best});
+  }
+  return out;
+}
+function startWorkout() {
+  const w = {id: uid(), date: today(), start: nowTime(), end: '', note: '', items: [],
+    startedAt: Date.now(), pausedMs: 0, focus: {i: 0, j: 0}};
+  S.workouts.push(w); save();
+  openSession(w.id);
+}
+function openSession(id) {
+  const w = S.workouts.find(x => x.id === id);
+  if (!w) return;
+  if (!w.startedAt) w.startedAt = Date.now();
+  if (!w.items) w.items = [];
+  if (!w.focus || !w.items[w.focus.i]) w.focus = {i: 0, j: 0};
+  W = w; sessRest = null; sessWork = null;
+  openSheet(sessionHtml(), () => paintSession(), 'full');
+  clearInterval(sessTimerId); sessTimerId = setInterval(sessTick, 500); sessTick();
+}
+function closeSession() {
+  clearInterval(sessTimerId); sessTimerId = null;
+  if (W && !(W.items || []).length && !W.end) { S.workouts = S.workouts.filter(x => x.id !== W.id); save(); }
+  sessRest = null; sessWork = null; W = null;
+  closeSheet(); render();
+}
+function sessionHtml() {
+  return `<div class="sess-head">
+      <div class="l"><span class="dot ${W.pausedAt ? 'off' : ''}" id="sessDot"></span><b id="sessLabel">${W.pausedAt ? 'Пауза' : 'Тренировка'}</b><span class="tt num" id="sessTimer">${fmtClock(elapsedMs(W))}</span></div>
+      <div class="r" style="display:flex;gap:8px">
+        <button class="ib" data-act="sessPause" aria-label="Пауза">${W.pausedAt ? '▶' : '⏸'}</button>
+        <button class="ib" data-act="sessFinish" aria-label="Завершить">✓</button></div>
+    </div>
+    <div class="sess-body" id="sessBody">${sessionBodyHtml()}</div>
+    <div class="sess-foot" id="sessFoot">${sessionFootHtml()}</div>`;
+}
+function sessionBodyHtml() {
+  if (!W.items.length) return `<div class="empty"><p>Выбери упражнение кнопкой внизу.<br>Вес и повторы подставятся из прошлой тренировки.</p></div>`;
+  if (!W.focus || !W.items[W.focus.i]) W.focus = {i: 0, j: 0};
+  const f = W.focus, it = W.items[f.i], ex = exOf(it.exId);
+  if (!it.sets.length) it.sets.push(defaultSet(ex.kind));
+  if (f.j >= it.sets.length) f.j = it.sets.length - 1;
+  const s = it.sets[f.j], prev = prevPerformance(it.exId);
+  let h = `<div class="exhead"><b>${esc(ex.name)}</b>
+      <div class="meta">${groupName(ex.group)} · подход ${f.j + 1} из ${it.sets.length}${ex.target ? ' · цель ' + fmtSec(ex.target) : ''}</div></div>
+    ${prev ? `<div class="meta">прошлый раз: ${fmtSet(ex, prev.set)} · ${fmtDay(prev.date)}</div>` : ''}
+    <div class="bigset"><div class="srow">${setFieldsHtml(ex, f.i, f.j, s, true)}</div></div>
+    <div class="prline" id="prLine">${prLineHtml(ex, s)}</div>
+    <h3>Подходы</h3>
+    <div class="setlist">${it.sets.map((x, j) => `<div class="setline">
+      <button class="setrow ${j === f.j ? 'cur' : ''}" data-act="focusSet" data-i="${f.i}" data-j="${j}">
+        <span class="n">${j + 1}</span><b class="v" data-row="${f.i}-${j}">${fmtSet(ex, x)}</b><span class="small">${j === f.j ? 'сейчас' : ''}</span></button>
+      <button class="x" data-act="delSet" data-i="${f.i}" data-j="${j}" aria-label="Удалить подход">✕</button></div>`).join('')}
+      <button class="addset" data-act="addSet" data-i="${f.i}">+ подход</button></div>`;
+  if (W.items.length > 1) {
+    h += `<h3>Упражнения</h3><div class="setlist">${W.items.map((x, i) => {
+      const e2 = exOf(x.exId);
+      return `<button class="setrow ${i === f.i ? 'cur' : ''}" data-act="focusItem" data-i="${i}"><span class="n">${i + 1}</span><b>${esc(e2.name)}</b><span class="small">${x.sets.length} ${plural(x.sets.length, 'подход', 'подхода', 'подходов')}</span></button>`;
+    }).join('')}</div>`;
+  }
+  return h;
+}
+function sessionFootHtml() {
+  if (!W.items.length) return `<button class="btn wide" data-act="pickEx">+ Упражнение</button>`;
+  if (sessRest) return restPanelHtml();
+  if (sessWork) return workPanelHtml();
+  const f = W.focus, it = W.items[f.i];
+  const ex = exOf(it.exId), last = f.j >= it.sets.length - 1, lastItem = f.i >= W.items.length - 1;
+  return `<div class="now"><div class="t"><span class="small">${W.pausedAt ? 'Пауза' : 'Сейчас'}</span>
+      <b>${esc(ex.name)} · подход ${f.j + 1} из ${it.sets.length}</b></div>
+      <button class="btn primary" data-act="sessNext">${last && lastItem ? 'Завершить' : last ? 'Дальше' : 'Следующий подход'}</button></div>
+    <div class="row" style="margin-top:4px">
+      <button class="link" data-act="pickEx">+ упражнение</button>
+      ${ex.kind === 'time' ? `<button class="link" data-act="sessWorkStart">⏱ ${ex.target ? fmtSec(ex.target) : 'таймер'}</button>` : ''}
+      ${last ? `<button class="link" data-act="sessEndEx">завершить упражнение</button>` : ''}
+    </div>`;
+}
+function paintSession() {
+  if (!W) return;
+  const b = $('#sessBody');
+  if (b) { b.innerHTML = sessionBodyHtml(); b.classList.toggle('resting', !!sessRest); }
+  if ($('#sessFoot')) $('#sessFoot').innerHTML = sessionFootHtml();
+}
+function restPanelHtml() {
+  const left = Math.max(0, Math.ceil((sessRest.until - Date.now()) / 1000));
+  return `<div class="restpanel"><div class="lbl">Отдых ${sessRest.kind === 'ex' ? 'перед следующим упражнением' : 'между подходами'}</div>
+    <div class="clock num" id="restClock">${fmtSec(left)}</div>
+    <div class="next">${esc(sessRest.next || '')}</div>
+    <div class="row"><button data-act="sessRestMore">+15 с</button><button data-act="sessRestSkip">Пропустить</button></div></div>`;
+}
+function workPanelHtml() {
+  const left = Math.max(0, Math.ceil((sessWork.until - Date.now()) / 1000));
+  return `<div class="restpanel"><div class="lbl">Подход по времени</div>
+    <div class="clock num" id="workClock">${fmtSec(left)}</div>
+    <div class="next">${esc(sessWork.label || '')}</div>
+    <div class="row"><button data-act="sessWorkStop">Закончить</button></div></div>`;
+}
+function nextLabelText() {
+  const f = W.focus, it = W.items[f.i];
+  if (!it) return '';
+  const ex = exOf(it.exId);
+  return 'дальше: ' + ex.name + ' · подход ' + (f.j + 1) + ' из ' + it.sets.length;
+}
+function beginRest(kind) {
+  const sec = kind === 'ex' ? (num(S.settings.restEx) || 120) : (num(S.settings.restSet) || 90);
+  sessWork = null;
+  sessRest = {until: Date.now() + sec * 1000, kind, next: nextLabelText()};
+}
+function sessNext() {
+  if (!W) return;
+  const f = W.focus, it = W.items[f.i];
+  if (!it) return;
+  if (f.j + 1 < it.sets.length) { W.focus = {i: f.i, j: f.j + 1}; beginRest('set'); }
+  else if (f.i + 1 < W.items.length) { W.focus = {i: f.i + 1, j: 0}; beginRest('ex'); }
+  else return finishSession();
+  save(); paintSession();
+}
+function sessEndEx() {
+  if (!W) return;
+  const f = W.focus;
+  if (f.i + 1 < W.items.length) { W.focus = {i: f.i + 1, j: 0}; beginRest('ex'); save(); paintSession(); }
+  else finishSession();
+}
+function focusSet(i, j) { W.focus = {i, j}; sessRest = null; sessWork = null; save(); paintSession(); }
+function togglePause() {
+  if (!W) return;
+  if (W.pausedAt) { W.pausedMs = (W.pausedMs || 0) + (Date.now() - W.pausedAt); delete W.pausedAt; }
+  else W.pausedAt = Date.now();
+  save();
+  $('#sessLabel').textContent = W.pausedAt ? 'Пауза' : 'Тренировка';
+  $('#sessDot').classList.toggle('off', !!W.pausedAt);
+  paintSession();
+}
+function sessTick() {
+  if (!W) return;
+  const t = $('#sessTimer'); if (t) t.textContent = fmtClock(elapsedMs(W));
+  if (sessRest) {
+    const left = Math.ceil((sessRest.until - Date.now()) / 1000);
+    const c = $('#restClock'); if (c) c.textContent = fmtSec(Math.max(0, left));
+    if (left <= 0) {
+      sessRest = null;
+      if (navigator.vibrate) navigator.vibrate([180, 90, 180]);
+      toast('Отдых закончился');
+      paintSession();
+    }
+  }
+  if (sessWork) {
+    const left = Math.ceil((sessWork.until - Date.now()) / 1000);
+    const c = $('#workClock'); if (c) c.textContent = fmtSec(Math.max(0, left));
+    if (left <= 0) finishWorkTimer(true);
+  }
+}
+function startWorkTimer() {
+  const f = W.focus, it = W.items[f.i], ex = exOf(it.exId);
+  sessWork = {until: Date.now() + (num(ex.target) || 60) * 1000, total: num(ex.target) || 60, label: ex.name};
+  paintSession();
+}
+function finishWorkTimer(done) {
+  if (!sessWork) return;
+  const f = W.focus, it = W.items[f.i];
+  const left = Math.max(0, Math.ceil((sessWork.until - Date.now()) / 1000));
+  const worked = done ? sessWork.total : Math.max(0, sessWork.total - left);
+  it.sets[f.j].sec = String(Math.round(worked || sessWork.total));
+  sessWork = null; save();
+  if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
+  paintSession();
+}
+function finishSession() {
+  const w = W; if (!w) return;
+  const st = {dur: elapsedMs(w), sets: wSets(w), vol: wVolume(w), prs: newPrs(w)};
+  const prev = sortWorkouts(S.workouts.filter(x => x.id !== w.id))[0];
+  if (prev && st.vol && wVolume(prev)) {
+    const d = st.vol - wVolume(prev);
+    st.prevNote = `Тоннаж ${nf.format(st.vol)} кг — на ${nf.format(Math.abs(d))} кг ${d >= 0 ? 'больше' : 'меньше'} прошлой тренировки`;
+  }
+  w.end = w.date === today() ? nowTime() : (w.end || '');
+  delete w.startedAt; delete w.pausedMs; delete w.pausedAt; delete w.focus;
+  save();
+  clearInterval(sessTimerId); sessTimerId = null;
+  sessRest = null; sessWork = null; W = null;
+  closeSheet(); render();
+  sheetSummary(st);
+}
+function sheetSummary(st) {
+  const prs = st.prs || [];
+  openSheet(`<div class="sheet-head"><h2>Тренировка завершена</h2></div>
+    <div class="card hero"><div class="lbl">Время</div><div class="big num">${fmtClock(st.dur)}</div>
+      <div class="row small num"><span>${st.sets} ${plural(st.sets, 'подход', 'подхода', 'подходов')}</span><span>${st.vol ? nf.format(st.vol) + ' кг' : '—'}</span></div></div>
+    ${prs.length ? `<h3>Новые рекорды</h3>${prs.map(p => `<div class="prow"><span class="i">🎉</span><b>${esc(p.ex.name)}</b><span class="small num">${fmtSet(p.ex, p.set)}</span></div>`).join('')}` : ''}
+    ${st.prevNote ? `<p class="hint">${st.prevNote}</p>` : ''}
+    <div class="btns"><button class="btn" data-act="summaryDone">Хорошо</button></div>`, null);
 }
 
 // ---------- picker ----------
@@ -570,6 +881,8 @@ function sheetEx(id) {
     <label class="small" style="display:block;margin-top:12px">Что записываем<select id="fKind">${ksel}</select></label>
     <div id="unitBox" class="small" style="margin-top:12px;${e.kind === 'distance' ? '' : 'display:none'}">Единица дистанции
       <select id="fUnit">${['км', 'м'].map(u => `<option ${e.unit === u ? 'selected' : ''}>${u}</option>`).join('')}</select></div>
+    <div id="targetBox" class="small" style="margin-top:12px;${e.kind === 'time' ? '' : 'display:none'}">Цель подхода, секунды
+      <input id="fTarget" type="number" inputmode="numeric" min="0" value="${e.target || ''}" placeholder="например 60"></div>
     ${id ? `<button class="btn ghost wide" style="margin-top:16px" data-act="openHistory" data-id="${id}">📈 История и график</button>` : ''}
     <div class="btns">${id ? `<button class="btn danger" data-act="delEx" data-id="${id}">Удалить</button>` : ''}
       <button class="btn" data-act="saveEx" data-id="${id || ''}">Сохранить</button></div>`, () => sheetEx(id));
@@ -630,18 +943,34 @@ const ACT = {
   closeSheet: () => closeSheet(),
   undo: () => { const fn = undoFn; undoFn = null; $('#undo').hidden = true; if (fn) fn(); },
   // workouts
-  newW: () => openWorkout(''),
-  openW: el => openWorkout(el.dataset.id),
+  newW: () => startWorkout(),
+  resumeW: el => openSession(el.dataset.id),
+  openW: el => { const w = S.workouts.find(x => x.id === el.dataset.id); if (w && w.startedAt) openSession(w.id); else openWorkout(el.dataset.id); },
   closeW: () => closeWorkout(),
-  backW: () => openWorkout(W ? W.id : ''),
+  backW: () => (W && W.startedAt ? openSession(W.id) : openWorkout(W ? W.id : '')),
   repeatLast: () => { const list = sortWorkouts(S.workouts); if (list.length) repeatWorkout(list[0].id); },
   pickEx: () => sheetPick(),
   pickEx2: el => {
     const id = el.dataset.id, ex = exOf(id);
-    if (!W) openWorkout('');
-    W.items.push({exId: id, sets: [defaultSet(ex.kind)]});
-    save(); paintItems(); openWorkout(W.id);
+    if (!W) { startWorkout(); return; }
+    W.items.push({exId: id, sets: [W.startedAt ? autoSet(id) : defaultSet(ex.kind)]});
+    if (W.startedAt) { W.focus = {i: W.items.length - 1, j: 0}; sessRest = null; }
+    save();
+    if (W.startedAt) openSheet(sessionHtml(), () => paintSession(), 'full');
+    else { paintItems(); openWorkout(W.id); }
   },
+  // session controls
+  sessNext: () => sessNext(),
+  sessEndEx: () => sessEndEx(),
+  sessPause: () => togglePause(),
+  sessFinish: () => finishSession(),
+  focusSet: el => focusSet(+el.dataset.i, +el.dataset.j),
+  focusItem: el => focusSet(+el.dataset.i, 0),
+  sessWorkStart: () => startWorkTimer(),
+  sessWorkStop: () => finishWorkTimer(false),
+  sessRestMore: () => { if (sessRest) { sessRest.until += 15000; sessTick(); } },
+  sessRestSkip: () => { sessRest = null; paintSession(); },
+  summaryDone: () => { closeSheet(); render(); },
   addSet: el => {
     const it = W.items[+el.dataset.i];
     const last = it.sets[it.sets.length - 1];
@@ -667,8 +996,9 @@ const ACT = {
     const name = ($('#fName').value || '').trim();
     if (!name) { toast('Введите название'); return; }
     const kind = $('#fKind').value, group = $('#fGroup').value, unit = $('#fUnit') ? $('#fUnit').value : '';
-    if (id) { const e = EX.get(id); Object.assign(e, {name, kind, group, unit: kind === 'distance' ? unit : ''}); }
-    else S.exercises.push({id: uid(), name, kind, group, unit: kind === 'distance' ? unit : '', custom: true});
+    const target = kind === 'time' && $('#fTarget') ? num($('#fTarget').value) : '';
+    if (id) { const e = EX.get(id); Object.assign(e, {name, kind, group, unit: kind === 'distance' ? unit : '', target}); }
+    else S.exercises.push({id: uid(), name, kind, group, unit: kind === 'distance' ? unit : '', target, custom: true});
     save(); closeSheet(); refreshAfterChange(); toast('Сохранено');
   },
   delEx: el => {
@@ -678,7 +1008,7 @@ const ACT = {
     undoToast('«' + e.name + '» удалено из библиотеки', () => { S.exercises.push(e); save(); refreshAfterChange(); });
   },
   // rest timer
-  restStart: () => { startRest(); toast('Отдых ' + fmtSec(num(S.settings.rest) || 90)); },
+  restStart: () => { startRest(); toast('Отдых ' + fmtSec(num(S.settings.restSet) || 90)); },
   restMore: () => { restEnd += 30000; paintRest(); },
   restStop: () => stopRest(),
   // settings and data
@@ -702,15 +1032,21 @@ document.addEventListener('click', e => {
 });
 $('#sheet').addEventListener('click', e => {
   if (e.target.id !== 'sheet') return;
-  if (W) closeWorkout(); else closeSheet();
+  if (W && W.startedAt) closeSession();
+  else if (W) closeWorkout();
+  else closeSheet();
 });
 document.addEventListener('input', e => {
   const el = e.target, d = el.dataset;
   if ('exq' in d) { exQ = el.value; const box = $('#exList'); if (box) box.innerHTML = exListHtml(); return; }
   if ('pickq' in d) { const box = $('#pickList'); if (box) box.innerHTML = pickListHtml(el.value); return; }
   if ('f' in d && W && d.i != null) {
-    const s = W.items[+d.i].sets[+d.j];
-    s[d.f] = el.value; saveSoon(); paintSum();
+    const it = W.items[+d.i], s = it.sets[+d.j];
+    s[d.f] = el.value; saveSoon();
+    const row = document.querySelector(`[data-row="${d.i}-${d.j}"]`);
+    if (row) row.textContent = fmtSet(exOf(it.exId), s);
+    if ($('#prLine') && W.focus && W.focus.i === +d.i && W.focus.j === +d.j) $('#prLine').innerHTML = prLineHtml(exOf(it.exId), s);
+    paintSum();
     return;
   }
   if ('wnote' in d && W) { W.note = el.value; saveSoon(); return; }
@@ -718,9 +1054,14 @@ document.addEventListener('input', e => {
 document.addEventListener('change', e => {
   const el = e.target, d = el.dataset;
   if ('wdate' in d && W) { W.date = el.value || today(); save(); paintItems(); return; }
-  if ('rest' in d) { S.settings.rest = num(el.value); save(); return; }
+  if ('restset' in d) { S.settings.restSet = num(el.value); save(); return; }
+  if ('restex' in d) { S.settings.restEx = num(el.value); save(); return; }
   if ('goal' in d) { S.settings.goal = num(el.value); save(); render(); return; }
-  if (el.id === 'fKind') { $('#unitBox').style.display = el.value === 'distance' ? '' : 'none'; return; }
+  if (el.id === 'fKind') {
+    $('#unitBox').style.display = el.value === 'distance' ? '' : 'none';
+    $('#targetBox').style.display = el.value === 'time' ? '' : 'none';
+    return;
+  }
 });
 $('#fileImport').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
